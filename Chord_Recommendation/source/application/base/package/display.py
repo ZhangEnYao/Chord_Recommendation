@@ -1,9 +1,10 @@
-from ..configuration import NUMBER_OF_FLATS
+from ..configuration import NUMBER_OF_FLATS, EMPTY_FLAT
+from .tools import InvertableMapping
 
 class Display():
 
     @classmethod
-    def for_fingerboard(cls, __strings):
+    def for_fingerboard(cls, __strings, compositions, mode):
         '''
         ---Sample----------------------------------------------------------------------------------------
         E       F               G               A               B       C               D               E
@@ -17,15 +18,19 @@ class Display():
         def get_flat(node): return node.flat
         def get_note(node): return node.note
 
-        for string in __strings:
+        for index in mode:
+            string = __strings[index]
 
             flats = tuple(map(get_flat, string.nodes))
             notes = tuple(map(get_note, string.nodes))
 
-            mapping = {flat: note for flat, note in zip(flats,
-                                                        notes)}
-
+            flat_note_mapping = InvertableMapping(flats, notes)
+            
+            print(f'[{index}]', end = '\t')
             for flat in range(NUMBER_OF_FLATS + 1):
-                if flat in flats: print(mapping[flat], end = '\t')
-                else: print(' ', end = '\t')
+                note = flat_note_mapping.map(flat)
+                if flat in flats and note in compositions:
+                    print(note, end = '\t')
+                else:
+                    print(EMPTY_FLAT, end = '\t')
             print()

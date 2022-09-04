@@ -1,9 +1,5 @@
 FROM python:3.10
 
-WORKDIR /app
-
-COPY . /app
-
 RUN pip install fastapi
 RUN pip install uvicorn
 
@@ -12,4 +8,8 @@ ENV HOST "0.0.0.0"
 
 EXPOSE 2155
 
-CMD uvicorn main:application --host 0.0.0.0 --port 2155
+WORKDIR /app
+
+COPY . /app
+
+CMD ["uvicorn", "main:application", "--host", "0.0.0.0", "--port", "2155"]

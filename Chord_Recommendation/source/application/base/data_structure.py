@@ -41,6 +41,7 @@ class AdjacentNotes():
             return 2
 
 class BasicMusicTheory(AdjacentNotes):
+
     heptatonic_scale = ('C', 'D', 'E', 'F', 'G', 'A', 'B')
 
     def get_interval(self, first_note, second_note):
@@ -103,17 +104,23 @@ class String(BasicMusicTheory):
                                                                  notes))
 
 class Guitar(String):
-    
-    def __init__(self, roots = ('E', 'A', 'D', 'G', 'B', 'E')):
+
+    string_index = ('1', '2', '3', '4', '5', '6')
+    normal_roots = ('E', 'B', 'G', 'D', 'A', 'E')
+    default_slice = slice(0, 5+1, 1)
+    bass_slice = slice(4, 5+1, 1)
+    modes = {'default': string_index[default_slice],
+             'bass': string_index[bass_slice]}
+
+    def __init__(self, roots = normal_roots):
+        root_index_mapping = InvertableMapping(roots, self.string_index)
         self.roots = roots
-        self.__strings = (String(root) for root in self.roots)
+        self.__strings = {index: String(root_index_mapping.map(index)) for index in self.string_index}
 
     @property
     def strings(self):
         return self.__strings
 
-    def show_fingerboard(self):
-        Display.for_fingerboard(self.strings)
-    
-    def show_compositions(self, chord):
-        return self.get_composition(chord)
+    def show_fingerboard(self, chord, mode = 'default'):
+        compositions = self.get_composition(chord)
+        Display.for_fingerboard(self.strings, compositions, self.modes[mode])
